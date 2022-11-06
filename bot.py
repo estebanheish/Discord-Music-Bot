@@ -1,5 +1,7 @@
 import os
 from asyncio import sleep
+from queue import Queue
+from typing import Union, Tuple
 
 import discord
 import pytube
@@ -11,9 +13,12 @@ from config import token
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents)
 
+song_queue = Queue()
+is_playing = False
+
 
 @client.command(name='play')
-async def on_ready(ctx: discord.Message, url: str) -> None:
+async def play(ctx: discord.Message, url: str) -> None:
     """
     Command that triggers the bot to download a YouTube video and play it in the voice channel, which the author of the
     command is connected to.
@@ -21,29 +26,44 @@ async def on_ready(ctx: discord.Message, url: str) -> None:
     :param url: URL of the video
     :return: None
     """
-    if ctx.author.voice is not None:
-        filepath = download_youtube(url)
 
-        channel: discord.VoiceChannel = ctx.author.voice.channel
-        vc: discord.VoiceClient = await channel.connect()
+    global is_playing
 
-        vc.play(discord.FFmpegPCMAudio(
-            executable=os.path.curdir + "\\ffmpeg\\bin\\ffmpeg.exe", source=filepath))
-
-        while vc.is_playing():
-            await sleep(5)
-
-        os.remove(filepath)
-        await vc.disconnect()
+    channel: Union[discord.VoiceClient, None] = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if channel is not None and channel.is_connected() is True:
+        vc: discord.VoiceClient = channel
+    elif ctx.author.voice is not None:
+        vc: discord.VoiceClient = await ctx.author.voice.channel.connect(self_deaf=True)
     else:
         await ctx.channel.send(content="Voice channel not found! :angry:")
+        return
+
+    filepath, file_length = download_youtube(url)
+    song_queue.put((filepath, file_length))
+
+    if is_playing is False:
+        is_playing = True
+        while not song_queue.empty():
+            song, length = song_queue.get()
+            vc.play(
+                discord.FFmpegPCMAudio(
+                    executable=os.curdir + "\\ffmpeg\\bin\\ffmpeg.exe",
+                    source=song
+                )
+            )
+            await sleep(length + 3)
+            os.remove(song)
+
+        await vc.disconnect()
+
+        is_playing = False
 
 
-def download_youtube(url: str) -> str:
+def download_youtube(url: str) -> Tuple[str, int]:
     """
     Downloads the YouTube video as an .mp3 file.
     :param url: URL for the video
-    :return: Filepath of the downloaded .mp3 file
+    :return: Filepath and length of the downloaded .mp3 file
     """
 
     yt: YouTube = YouTube(url)
@@ -57,7 +77,7 @@ def download_youtube(url: str) -> str:
         os.remove(new_file)  # Check if the file already exists. Overwriting is not possible
     os.rename(out_file, new_file)
 
-    return new_file
+    return new_file, yt.length
 
 
 client.run(token)
