@@ -8,7 +8,7 @@ import pytube
 from discord.ext import commands
 from pytube import YouTube
 
-from config import token
+from config import token, ffmpeg_location
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents)
@@ -47,7 +47,7 @@ async def play(ctx: discord.Message, url: str) -> None:
             song, length = song_queue.get()
             vc.play(
                 discord.FFmpegPCMAudio(
-                    executable=os.curdir + "\\ffmpeg\\bin\\ffmpeg.exe",
+                    executable=ffmpeg_location,
                     source=song
                 )
             )
@@ -80,4 +80,5 @@ def download_youtube(url: str) -> Tuple[str, int]:
     return new_file, yt.length
 
 
+print(discord.utils.oauth_url(client_id=client.application_id))
 client.run(token)
