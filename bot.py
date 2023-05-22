@@ -7,15 +7,16 @@ from typing import Union, Tuple
 
 import discord
 import pytube
-from discord import Message, VoiceClient, FFmpegPCMAudio, Member, VoiceState
+from discord import Message, VoiceClient, FFmpegPCMAudio, Member, VoiceState, Permissions
 from discord.ext import commands
+from discord.utils import oauth_url
 from pytube import YouTube
 
 from config import token, ffmpeg_location
 import validators
 
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix='!', intents=intents, case_insensitive=True)
+client = commands.Bot(command_prefix='s!', intents=intents, case_insensitive=True)
 
 song_queue: Queue[Tuple[str, int, bool]] = Queue()
 is_playing = False
@@ -27,8 +28,12 @@ async def on_ready() -> None:
     Function that prints an invitation URL after the bot is loaded.
     :return: None
     """
-
-    print(discord.utils.oauth_url(client_id=client.application_id))
+    perms = ['read_messages', 'send_messages', 'read_message_history', 'add_reactions', 'connect', 'speak',
+             'use_voice_activation']
+    a = Permissions()
+    for perm in perms:  # Probably there's a prettier way of doing this
+        a.__setattr__(perm, True)
+    print(oauth_url(client_id=client.application_id, permissions=a))
 
 
 @client.event
@@ -126,7 +131,13 @@ async def play(ctx: Message, *args) -> None:
         videos_result = await videos_search.next()
         url = videos_result['result'][0]['link']
 
-    filepath, file_length = await download_youtube(url)
+    filepath, file_length, title, thumbnail = await download_youtube(url)
+    last_slash = thumbnail.rfind('/')
+    thumbnail = thumbnail[:last_slash] + '/mqdefault.jpg'
+
+    # Send a cool embedded message with song details and url
+    embedded_message = await create_embedded_message(title, url, thumbnail, ctx.author.avatar, ctx.author.name)
+    await ctx.channel.send(embed=embedded_message)
 
     # The last parameter is whether the file should be deleted after it is played.
     song_queue.put((filepath, file_length, True))
@@ -135,7 +146,18 @@ async def play(ctx: Message, *args) -> None:
         await play_in_channel(vc=vc)
 
 
-async def download_youtube(url: str) -> Tuple[str, int]:
+async def create_embedded_message(title, url, thumbnail, author_avatar, author_name) -> discord.Embed:
+    # The song title in the square brackets is rendered with hyperlink to the url in the parentheses
+    embed = discord.Embed(
+        title='Now Playing',
+        description=f'[{title}]({url})'
+    )
+    embed.set_thumbnail(url=thumbnail)
+    embed.set_author(name=author_name, icon_url=author_avatar)
+    return embed
+
+
+async def download_youtube(url: str) -> Tuple[str, int, str, str]:
     """
     Downloads the YouTube video as an .mp3 file.
     :param url: URL for the video
@@ -153,7 +175,7 @@ async def download_youtube(url: str) -> Tuple[str, int]:
         os.remove(new_file)  # Check if the file already exists. Overwriting is not possible
     os.rename(out_file, new_file)
 
-    return new_file, yt.length
+    return new_file, yt.length, yt.title, yt.thumbnail_url
 
 
 async def connect_channel(ctx: Message) -> Union[VoiceClient, None]:
