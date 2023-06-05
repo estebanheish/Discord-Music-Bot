@@ -1,4 +1,5 @@
 from discord import Message
+from typing import Optional
 
 
 class PlayItem:
@@ -8,9 +9,9 @@ class PlayItem:
             internal: bool,
             length: int,
             download_url: str,
-            title: str = '',
-            thumbnail: str = '',
-            video_url: str = ''
+            title: Optional[str] = '',
+            thumbnail: Optional[str] = '',
+            video_url: Optional[str] = ''
     ):
         self.message: Message = message
         self.internal: bool = internal  # Used for signaling internal resources.
