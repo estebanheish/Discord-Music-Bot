@@ -26,7 +26,7 @@ class Player:
         :return: None
         """
         while len(self.queue):
-            play_item = self.queue.pop()  # Retrieve next play_item.
+            play_item = self.queue.pop(0)  # Retrieve next play_item.
 
             if not play_item.message.guild.voice_client:  # Stop execution if bot has been disconnected.
                 self.queue.clear()
