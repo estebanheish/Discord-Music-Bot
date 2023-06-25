@@ -87,3 +87,14 @@ class Player:
         vc.stop()
         self.task.cancel()
         self.task = asyncio.create_task(self.play_in_channel())
+
+    async def pause(self) -> None:
+        """
+        Simple method for pausing the voice client.
+
+        :return: None
+        """
+        vc: Union[VoiceClient, None] = self.guild.voice_client
+
+        if not vc.is_paused():
+            vc.pause()

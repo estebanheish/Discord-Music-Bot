@@ -155,3 +155,16 @@ class MusicController:
             return
 
         await cls.players[ctx.guild.id].recreate_player_task()
+
+    @classmethod
+    async def pause_player(cls, ctx: Context) -> None:
+        """
+        Method for pausing the currently playing song.
+
+        :param ctx: Context
+        :return: None
+        """
+        if ctx.guild.id not in cls.players.keys():
+            return
+
+        await cls.players[ctx.guild.id].pause()
