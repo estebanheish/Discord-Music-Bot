@@ -1,5 +1,7 @@
+import json
 from configparser import ConfigParser
 import os
+from typing import Dict
 
 cfg = ConfigParser()
 cfg.read('config.cfg')
@@ -15,6 +17,13 @@ else:
     ffmpeg_location = None
 
 del operating_system
+
+logging_level = cfg['Information']['logging_level'].upper()
+
+del cfg
+
+with open("command_descriptions.json") as desc:
+    command_descriptions: Dict[str, str] = json.loads(desc.read())
 
 logging_level = cfg['Information']['logging_level'].upper()
 
