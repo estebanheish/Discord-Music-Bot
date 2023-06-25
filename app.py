@@ -1,9 +1,10 @@
 import asyncio
+import logging
 
 import discord
 from discord import Intents
 
-from bot import *
+from bot import Bot, BotEvents, BotCommands, token, logging_level
 
 intents = Intents.all()
 client = Bot(command_prefix='s!', intents=intents, case_insensitive=True)
@@ -16,5 +17,5 @@ async def main() -> None:
         client.activity = discord.Game('Under reconstruction')
         await client.start(token)
 
-
+logging.basicConfig(level=logging_level)
 asyncio.run(main())

@@ -15,3 +15,7 @@ else:
     ffmpeg_location = None
 
 del operating_system
+
+logging_level = cfg['Information']['logging_level'].upper()
+
+del cfg
