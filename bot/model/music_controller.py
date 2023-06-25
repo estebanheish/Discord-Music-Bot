@@ -60,6 +60,7 @@ class MusicController:
 
         if ctx.guild.id not in cls.players.keys() or cls.players[ctx.guild.id].expired:
             cls.players[ctx.guild.id] = Player(
+                guild=ctx.guild,
                 play_item=play_item
             )
         else:
@@ -79,6 +80,7 @@ class MusicController:
         play_item = PlayItem(message=ctx.message, internal=True, length=39, download_url='./misc/slavi.wav')
 
         cls.players[ctx.guild.id] = Player(
+            guild=ctx.guild,
             play_item=play_item
         )
 
@@ -125,7 +127,8 @@ class MusicController:
             return
 
         player = cls.players[ctx.guild.id]
-        player.task.cancel()
+        player.queue.clear()
+        await player.recreate_player_task()
 
     @classmethod
     async def clear_queue(cls, ctx: Context) -> None:

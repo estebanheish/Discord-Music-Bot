@@ -1,7 +1,8 @@
 import asyncio
 from typing import List, Union
 
-from discord import FFmpegPCMAudio, VoiceClient, Embed
+from discord import FFmpegPCMAudio, VoiceClient, Embed, Guild
+
 from bot import ffmpeg_location
 from bot.model import PlayItem
 
@@ -10,10 +11,11 @@ class Player:
     """
     Class for playing music in channels.
     """
-    def __init__(self, play_item: PlayItem):
+    def __init__(self, guild: Guild, play_item: PlayItem):
         # `expired` is used for showing when the Player queue is empty and the object has expired. After that a new
         # Player object has to be created in its place.
         self.expired: bool = False
+        self.guild: Guild = guild
         self.queue: List[PlayItem] = [play_item]
         self.task: asyncio.Task = asyncio.create_task(self.play_in_channel())  # Start background process.
 
@@ -28,12 +30,12 @@ class Player:
         while len(self.queue):
             play_item = self.queue.pop(0)  # Retrieve next play_item.
 
-            if not play_item.message.guild.voice_client:  # Stop execution if bot has been disconnected.
+            if not self.guild.voice_client:  # Stop execution if bot has been disconnected.
                 self.queue.clear()
                 self.expired = True
                 return
 
-            vc: Union[VoiceClient, None] = play_item.message.guild.voice_client
+            vc: Union[VoiceClient, None] = self.guild.voice_client
 
             if not play_item.internal:  # Don't send an embed if the song is internal. Mainly for `join` command.
                 await Player._send_embed(play_item=play_item)
@@ -72,3 +74,16 @@ class Player:
         embed.set_author(name=message.author.name, icon_url=message.author.avatar.url)
 
         await message.channel.send(embed=embed)
+
+    async def recreate_player_task(self) -> None:
+        """
+        Method used for recreating the player task. When called, it stops playing the song, afterwards it stops the
+        asyncio FFMPEG task and finally recreates it. This is useful when the player has to be stopped or the current
+        song has to be skipped.
+
+        :return: None
+        """
+        vc: Union[VoiceClient, None] = self.guild.voice_client
+        vc.stop()
+        self.task.cancel()
+        self.task = asyncio.create_task(self.play_in_channel())
