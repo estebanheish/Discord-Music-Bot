@@ -20,7 +20,7 @@ del operating_system
 
 logging_level = cfg['Information']['logging_level'].upper()
 
-with open("command_descriptions.json") as desc:
+with open("misc/command_descriptions.json") as desc:
     command_descriptions: Dict[str, str] = json.loads(desc.read())
 
 del cfg
