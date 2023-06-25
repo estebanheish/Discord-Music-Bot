@@ -113,3 +113,16 @@ class BotCommands(commands.Cog):
             await MusicController.clear_queue(ctx=ctx)
         else:
             await ctx.reply("I'm not even connected! :triumph:")
+
+    @commands.command()
+    async def skip(self, ctx: Context) -> None:
+        """
+        Method used for skipping the current playing song. It checks whether the bot is present in any of the voice
+        channels and tells MusicController to proceed with skipping the song.
+        :param ctx: Context
+        :return: None
+        """
+        if ctx.guild.voice_client:
+            await MusicController.skip_song(ctx=ctx)
+        else:
+            await ctx.reply("I'm not even connected! :triumph:")
