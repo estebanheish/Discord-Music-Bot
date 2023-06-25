@@ -139,3 +139,16 @@ class BotCommands(commands.Cog):
             await MusicController.pause_player(ctx=ctx)
         else:
             await ctx.reply("I'm not even connected! :triumph:")
+
+    @commands.command()
+    async def resume(self, ctx: Context) -> None:
+        """
+        Method used for resuming a song if it has been paused. It checks whether the bot is present in any of the voice
+        channels and tells MusicController to proceed with resuming the song.
+        :param ctx: Context
+        :return: None
+        """
+        if ctx.guild.voice_client:
+            await MusicController.resume_player(ctx=ctx)
+        else:
+            await ctx.reply("I'm not even connected! :triumph:")

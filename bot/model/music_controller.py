@@ -168,3 +168,16 @@ class MusicController:
             return
 
         await cls.players[ctx.guild.id].pause()
+
+    @classmethod
+    async def resume_player(cls, ctx: Context) -> None:
+        """
+        Method for resuming the previously playing song.
+
+        :param ctx: Context
+        :return: None
+        """
+        if ctx.guild.id not in cls.players.keys():
+            return
+
+        await cls.players[ctx.guild.id].resume()

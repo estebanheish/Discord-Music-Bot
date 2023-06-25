@@ -98,3 +98,14 @@ class Player:
 
         if not vc.is_paused():
             vc.pause()
+
+    async def resume(self) -> None:
+        """
+        Simple method for resuming the voice client.
+
+        :return: None
+        """
+        vc: Union[VoiceClient, None] = self.guild.voice_client
+
+        if vc.is_paused():
+            vc.resume()
