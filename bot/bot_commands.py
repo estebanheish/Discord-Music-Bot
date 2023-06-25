@@ -15,7 +15,7 @@ class BotCommands(commands.Cog):
         self.client = client
 
     @staticmethod
-    async def get_voice_channel(ctx: Context) -> Union[VoiceClient, None]:
+    async def _get_voice_channel(ctx: Context) -> Union[VoiceClient, None]:
         """
         Static method to retrieve the channel the bot is currently in. If it is not joined in any channel, it tries to
         connect to the caller's channel.
@@ -44,7 +44,7 @@ class BotCommands(commands.Cog):
             await ctx.reply("I'm already connected! :rage:")
             return
 
-        vc = await BotCommands.get_voice_channel(ctx=ctx)
+        vc = await BotCommands._get_voice_channel(ctx=ctx)
 
         if not vc:
             await ctx.reply("Voice channel not found! :angry:")
@@ -63,7 +63,7 @@ class BotCommands(commands.Cog):
         :param args: Music info - can be URL or title of the song
         :return: None
         """
-        vc = await BotCommands.get_voice_channel(ctx=ctx)
+        vc = await BotCommands._get_voice_channel(ctx=ctx)
 
         if not vc:
             await ctx.reply("Voice channel not found! :angry:")
