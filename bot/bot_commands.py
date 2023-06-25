@@ -52,7 +52,6 @@ class BotCommands(commands.Cog):
             return
 
         await MusicController.play_intro_song(ctx=ctx)
-        await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
     @commands.command(brief=command_descriptions.get('play'))
     async def play(self, ctx: Context, *args) -> None:
@@ -86,7 +85,7 @@ class BotCommands(commands.Cog):
         if ctx.guild.voice_client:
             await MusicController.destroy_player(ctx=ctx)
             await ctx.guild.voice_client.disconnect(force=False)
-            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
+            await ctx.message.add_reaction('\N{WAVING HAND SIGN}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
