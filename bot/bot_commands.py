@@ -51,6 +51,7 @@ class BotCommands(commands.Cog):
             return
 
         await MusicController.play_intro_song(ctx=ctx)
+        await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
     @commands.command()
     async def play(self, ctx: Context, *args) -> None:
@@ -84,6 +85,7 @@ class BotCommands(commands.Cog):
         if ctx.guild.voice_client:
             await MusicController.destroy_player(ctx=ctx)
             await ctx.guild.voice_client.disconnect(force=False)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
@@ -98,6 +100,7 @@ class BotCommands(commands.Cog):
         """
         if ctx.guild.voice_client:
             await MusicController.stop_playing(ctx=ctx)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
@@ -111,6 +114,7 @@ class BotCommands(commands.Cog):
         """
         if ctx.guild.voice_client:
             await MusicController.clear_queue(ctx=ctx)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
@@ -124,6 +128,7 @@ class BotCommands(commands.Cog):
         """
         if ctx.guild.voice_client:
             await MusicController.skip_song(ctx=ctx)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
@@ -137,6 +142,7 @@ class BotCommands(commands.Cog):
         """
         if ctx.guild.voice_client:
             await MusicController.pause_player(ctx=ctx)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
 
@@ -150,5 +156,6 @@ class BotCommands(commands.Cog):
         """
         if ctx.guild.voice_client:
             await MusicController.resume_player(ctx=ctx)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         else:
             await ctx.reply("I'm not even connected! :triumph:")
