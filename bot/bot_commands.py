@@ -100,3 +100,16 @@ class BotCommands(commands.Cog):
             await MusicController.stop_playing(ctx=ctx)
         else:
             await ctx.reply("I'm not even connected! :triumph:")
+
+    @commands.command()
+    async def clear(self, ctx: Context) -> None:
+        """
+        Method used for clearing the queue of the music player. It checks whether the bot is present in any of the voice
+        channels and tells MusicController to proceed with clearing the queue.
+        :param ctx: Context
+        :return: None
+        """
+        if ctx.guild.voice_client:
+            await MusicController.clear_queue(ctx=ctx)
+        else:
+            await ctx.reply("I'm not even connected! :triumph:")
