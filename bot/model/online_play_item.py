@@ -1,5 +1,4 @@
 from discord import Message
-from typing import Optional
 from bot.model import BasePlayItem
 
 
@@ -9,9 +8,9 @@ class OnlinePlayItem(BasePlayItem):
             message: Message,
             length: int,
             path: str,
-            title: Optional[str] = '',
-            thumbnail: Optional[str] = '',
-            video_url: Optional[str] = ''
+            title: str,
+            thumbnail: str,
+            video_url: str
     ):
         super().__init__(message=message, length=length, path=path)
         self.title: str = title
