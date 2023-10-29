@@ -4,19 +4,19 @@ from typing import List, Union
 from discord import FFmpegPCMAudio, VoiceClient, Embed, Guild
 
 from bot import ffmpeg_location
-from bot.model import PlayItem
+from bot.model import OnlinePlayItem, BasePlayItem
 
 
 class Player:
     """
     Class for playing music in channels.
     """
-    def __init__(self, guild: Guild, play_item: PlayItem):
+    def __init__(self, guild: Guild, play_item: BasePlayItem):
         # `expired` is used for showing when the Player queue is empty and the object has expired. After that a new
         # Player object has to be created in its place.
         self.expired: bool = False
         self.guild: Guild = guild
-        self.queue: List[PlayItem] = [play_item]
+        self.queue: List[BasePlayItem] = [play_item]
         self.task: asyncio.Task = asyncio.create_task(self.play_in_channel())  # Start background process.
 
     async def play_in_channel(self) -> None:
@@ -29,6 +29,7 @@ class Player:
         """
         while len(self.queue):
             play_item = self.queue.pop(0)  # Retrieve next play_item.
+            before_options = ''
 
             if not self.guild.voice_client:  # Stop execution if bot has been disconnected.
                 self.queue.clear()
@@ -37,15 +38,16 @@ class Player:
 
             vc: Union[VoiceClient, None] = self.guild.voice_client
 
-            if not play_item.internal:  # Don't send an embed if the song is internal. Mainly for `join` command.
+            # Don't send an embed if the song is internal. Mainly for `join` command.
+            if isinstance(play_item, OnlinePlayItem):
                 await Player._send_embed(play_item=play_item)
+                before_options = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
 
             vc.play(
                 FFmpegPCMAudio(
-                    source=play_item.download_url,
+                    source=play_item.path,
                     executable=ffmpeg_location,
-                    before_options='-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5' if not
-                    play_item.internal else '',  # Reconnect if connection is lost to URL source. Happens often.
+                    before_options=before_options,  # Reconnect if connection is lost to URL source. Happens often.
                     options='-vn'
                 )
             )
@@ -58,7 +60,7 @@ class Player:
         self.expired = True
 
     @staticmethod
-    async def _send_embed(play_item: PlayItem) -> None:
+    async def _send_embed(play_item: OnlinePlayItem) -> None:
         """
         Internal method for creating and sending an embed. Sent when a song starts playing.
 

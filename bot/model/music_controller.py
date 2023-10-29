@@ -6,7 +6,7 @@ from discord import VoiceChannel
 from discord.ext.commands import Context
 from yt_dlp import YoutubeDL
 
-from bot.model import Player, PlayItem
+from bot.model import Player, LocalPlayItem, OnlinePlayItem
 
 
 class MusicController:
@@ -32,7 +32,7 @@ class MusicController:
         return math.ceil(data['duration']), data['url'], data['title'], data['thumbnail'], data['webpage_url']
 
     @staticmethod
-    async def _get_play_item(ctx: Context, url: str) -> PlayItem:
+    async def _get_play_item(ctx: Context, url: str) -> OnlinePlayItem:
         """
         Internal method used for creating a PlayItem object with data provided by `_search_video`.
 
@@ -40,7 +40,7 @@ class MusicController:
         :param url: String - May contain a direct URL or search keywords
         :return: PlayItem
         """
-        return PlayItem(ctx.message, False, *MusicController._search_video(url=url))
+        return OnlinePlayItem(ctx.message, *MusicController._search_video(url=url))
 
     @classmethod
     async def add_to_queue(cls, ctx: Context, url: str) -> None:
@@ -77,7 +77,7 @@ class MusicController:
         :param ctx: Context
         :return: None
         """
-        play_item = PlayItem(message=ctx.message, internal=True, length=39, download_url='./misc/slavi.wav')
+        play_item = LocalPlayItem(message=ctx.message, length=39, path='./misc/slavi.wav')
 
         cls.players[ctx.guild.id] = Player(
             guild=ctx.guild,
