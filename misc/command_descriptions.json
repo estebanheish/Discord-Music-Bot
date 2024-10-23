@@ -1,8 +1,8 @@
 {
-  "invite": "Generate invite for the bot",
+  "invite": "Generate invite for the bot.",
   "clear": "Clear the queue.",
   "join": "Join the voice channel and play entry song.",
-  "leave": "Leave the voice channel. Can be used with `dc` and `disconnect`",
+  "leave": "Leave the voice channel. Can be also called with `dc` and `disconnect`.",
   "pause": "Pause the currently playing song.",
   "play": "Play a video from YouTube.",
   "resume": "Resume the previously playing song.",
