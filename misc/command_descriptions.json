@@ -1,4 +1,5 @@
 {
+  "invite": "Generate invite for the bot",
   "clear": "Clear the queue.",
   "join": "Join the voice channel and play entry song.",
   "leave": "Leave the voice channel. Can be used with `dc` and `disconnect`",
