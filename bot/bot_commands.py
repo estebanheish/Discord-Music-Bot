@@ -1,11 +1,12 @@
 from typing import Union
 
-from discord import VoiceClient
+from discord import VoiceClient, Permissions
 from discord.ext import commands
 from discord.ext.commands import Bot, Context
+from discord.utils import oauth_url
 
-from bot.model.music_controller import MusicController
 from bot import command_descriptions
+from bot.model.music_controller import MusicController
 
 
 class BotCommands(commands.Cog):
@@ -31,6 +32,20 @@ class BotCommands(commands.Cog):
         elif ctx.author.voice is not None:
             return await ctx.author.voice.channel.connect(self_deaf=True)
         return None
+
+    @commands.command(brief=command_descriptions.get('invite'))
+    async def invite(self, ctx: Context) -> None:
+        """
+        Command that makes the bot post an invite to the channel.
+        :param ctx: Context
+        :return: None
+        """
+        perms = ['read_messages', 'send_messages', 'embed_links', 'read_message_history', 'add_reactions', 'connect',
+                 'speak', 'use_voice_activation']
+        a = Permissions()
+        for perm in perms:  # Probably there's a prettier way of doing this.
+            a.__setattr__(perm, True)
+        await ctx.reply(oauth_url(client_id=self.client.application_id, permissions=a))
 
     @commands.command(brief=command_descriptions.get('join'))
     async def join(self, ctx: Context) -> None:
