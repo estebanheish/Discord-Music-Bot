@@ -136,3 +136,5 @@ config.cfg
 
 # PyCharm files
 /.idea
+.direnv/
+result

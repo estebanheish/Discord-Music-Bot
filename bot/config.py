@@ -12,7 +12,7 @@ operating_system = cfg['Information']['Operating_System'].lower()
 if operating_system == 'windows':
     ffmpeg_location = os.curdir + "\\ffmpeg\\bin\\ffmpeg.exe"
 elif operating_system == 'linux':
-    ffmpeg_location = '/usr/bin/ffmpeg'
+    ffmpeg_location = 'ffmpeg'
 else:
     ffmpeg_location = None
 
